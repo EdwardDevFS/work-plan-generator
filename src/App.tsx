@@ -21,6 +21,9 @@ import Teams from './pages/rethinking/Teams';
 import { UsersManagement } from './pages/rethinking/UserManagement';
 import { RolesManagement } from './pages/rethinking/RoleManagement';
 import { ZonalsManagement } from './pages/rethinking/ZonalsManagement';
+import Tenants from './pages/Tenants';
+import Activities from './pages/Activities';
+import Forms from './pages/Forms';
 
 function App() {
   return (
@@ -97,14 +100,6 @@ function App() {
                     </ProtectedRoute>
                   } 
                 />
-                {/* <Route 
-                  path="dashboard" 
-                  element={
-                    <ProtectedRoute viewKey="dashboard">
-                      <Dashboard />
-                    </ProtectedRoute>
-                  } 
-                />
                 
                 <Route 
                   path="tenants" 
@@ -115,7 +110,7 @@ function App() {
                   } 
                 />
                 
-                <Route 
+                {/* <Route 
                   path="users" 
                   element={
                     <ProtectedRoute viewKey="users">
@@ -142,14 +137,7 @@ function App() {
                   } 
                 />
                 
-                <Route 
-                  path="forms" 
-                  element={
-                    <ProtectedRoute viewKey="forms">
-                      <Forms />
-                    </ProtectedRoute>
-                  } 
-                />
+
                 
                 <Route 
                   path="work-plans" 
@@ -160,16 +148,24 @@ function App() {
                   } 
                 />
                 
-                <Route 
+ */}
+              <Route 
+                  path="forms" 
+                  element={
+                    <ProtectedRoute viewKey="forms">
+                      <Forms />
+                    </ProtectedRoute>
+                  } 
+              />
+              <Route 
                   path="activities" 
                   element={
                     <ProtectedRoute viewKey="activities">
                       <Activities />
                     </ProtectedRoute>
                   } 
-                /> */}
+                />
               </Route>
-              
               <Route path="*" element={<Navigate to="/users-management" replace />} />
             </Routes>
           </div>
