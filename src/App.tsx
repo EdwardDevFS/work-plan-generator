@@ -24,6 +24,7 @@ import { ZonalsManagement } from './pages/rethinking/ZonalsManagement';
 import Tenants from './pages/Tenants';
 import Activities from './pages/Activities';
 import Forms from './pages/Forms';
+import Roles from './pages/Roles';
 
 function App() {
   return (
@@ -53,14 +54,14 @@ function App() {
                 />
                 
                 {/* Usuarios original (mantener compatibilidad) */}
-                {/* <Route 
+                <Route 
                   path="users" 
                   element={
                     <ProtectedRoute viewKey="users">
                       <Users />
                     </ProtectedRoute>
                   } 
-                /> */}
+                /> 
                 
                 {/* Nueva gestión de roles mejorada */}
                 <Route 
@@ -73,14 +74,14 @@ function App() {
                 />
                 
                 {/* Roles original (mantener compatibilidad) */}
-                {/* <Route 
+                <Route 
                   path="roles" 
                   element={
                     <ProtectedRoute viewKey="roles">
                       <Roles />
                     </ProtectedRoute>
                   } 
-                /> */}
+                />
                 
                 {/* Nuevas rutas del sistema operativo */}
                 <Route 

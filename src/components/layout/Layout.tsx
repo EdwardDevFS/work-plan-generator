@@ -1,11 +1,9 @@
 import React, { useState } from 'react';
 import { Outlet } from 'react-router-dom';
-import { Button } from 'primereact/button';
 import { Toast } from 'primereact/toast';
 import { ConfirmDialog } from 'primereact/confirmdialog';
 import Header from './Header';
 import Sidebar from './Sidebar';
-import { Icon } from '@iconify/react';
 
 const Layout: React.FC = () => {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
@@ -15,15 +13,22 @@ const Layout: React.FC = () => {
   };
 
   return (
-    <div className="flex h-screen bg-gray-100">
+    <div className="flex h-screen bg-[#1a1a1a]">
       <Sidebar collapsed={sidebarCollapsed} />
       
       <div className="flex-1 flex flex-col overflow-hidden">
-        <Header toggleSidebar={toggleSidebar} sidebarCollapsed={sidebarCollapsed}/>
+        {/* Franja superior del mismo color que el sidebar */}
+        <div className="bg-[#1a1a1a] h-16"></div>
         
-        <main className="flex-1 overflow-auto p-6">
-
-          <div className="bg-white rounded-lg shadow-sm min-h-full">
+        {/* Contenedor principal con borde redondeado y sombra */}
+        <main className="flex-1 overflow-auto bg-gray-50 rounded-tl-3xl shadow-2xl -mt-16">
+          {/* Header dentro del área blanca */}
+          <div className="bg-white px-6 py-4 sticky top-0 z-10 border-b border-gray-200">
+            <Header toggleSidebar={toggleSidebar} sidebarCollapsed={sidebarCollapsed}/>
+          </div>
+          
+          {/* Contenido */}
+          <div className="p-6">
             <Outlet />
           </div>
         </main>

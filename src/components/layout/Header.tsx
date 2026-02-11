@@ -19,7 +19,7 @@ interface TenantOption {
 }
 
 const Header = ({ sidebarCollapsed, toggleSidebar }: IHeaderParams) => {
-  const { user, logout } = useAuth();
+  const { user } = useAuth();
   const { selectedTenant, setSelectedTenant } = useTenant();
   const [tenants, setTenants] = useState<TenantOption[]>([]);
   const [loading, setLoading] = useState(false);
@@ -54,10 +54,6 @@ const Header = ({ sidebarCollapsed, toggleSidebar }: IHeaderParams) => {
     }
   };
 
-  const handleLogout = () => {
-    logout();
-  };
-
   const getUserName = () => {
     if (!user) return 'Usuario';
     return user.userId.substring(0, 8);
@@ -65,8 +61,8 @@ const Header = ({ sidebarCollapsed, toggleSidebar }: IHeaderParams) => {
 
   const tenantOptionTemplate = (option: TenantOption) => {
     return (
-      <div className="flex flex-col">
-        <span className="font-medium">{option.text}</span>
+      <div className="flex flex-col py-1">
+        <span className="font-medium text-gray-900">{option.text}</span>
         {option.description && (
           <span className="text-xs text-gray-500">{option.description}</span>
         )}
@@ -75,34 +71,40 @@ const Header = ({ sidebarCollapsed, toggleSidebar }: IHeaderParams) => {
   };
 
   return (
-    <header className="bg-white shadow-sm border-b border-gray-200 px-6 py-4">
-      <div className="flex items-center justify-between">
-        <div className="flex items-center space-x-4">
+    <header className="bg-white h-full flex items-center">
+      <div className="flex items-center justify-between w-full">
+        {/* Left Section */}
+        <div className="flex items-center gap-3">
           <Button
             icon={
               <Icon
-                icon={sidebarCollapsed ? 'lucide:sidebar-open' : 'lucide:sidebar-close'}
+                icon={sidebarCollapsed ? 'mdi:menu' : 'mdi:menu-open'}
                 className="text-2xl"
               />
             }
-            tooltip={sidebarCollapsed ? 'Expandir sidebar' : 'Colapsar sidebar'}
-            severity="secondary"
+            className="!border-none !outline-none text-gray-600 hover:text-gray-900 hover:bg-gray-100 p-2"
+            style={{ boxShadow: 'none' }}
+            rounded
             text
             onClick={toggleSidebar}
           />
-          <Icon icon="mdi:store-outline" className="text-blue-600 text-3xl" />
-          <h1 className="text-xl font-semibold text-gray-900">
-            Sistema de Supervisión Retail
-          </h1>
+          
+          <div className="flex items-center gap-4 pl-2 border-l border-gray-200">
+            <div className="w-9 h-9 bg-blue-600 rounded-lg flex items-center justify-center">
+              <Icon icon="mdi:store-outline" className="text-white text-2xl" />
+            </div>
+            <h1 className="text-base font-semibold text-gray-900">
+              Sistema de Supervisión Retail
+            </h1>
+          </div>
         </div>
 
-        <div className="flex items-center space-x-4">
+        {/* Right Section */}
+        <div className="flex items-center gap-4">
           {/* Dropdown de Tenants */}
-          {
-            user?.roles.some(x => x.name == 'System Administrator') && (
-
-            <div className="flex items-center space-x-2">
-              <Icon icon="mdi:office-building" className="text-gray-600 text-xl" />
+          {user?.roles.some(x => x.name === 'System Administrator') && (
+            <div className="flex items-center gap-2 px-3 py-1.5 bg-gray-800 rounded-lg border border-gray-200">
+              <Icon icon="mdi:office-building" className="text-white text-base" />
               <Dropdown
                 value={selectedTenant}
                 options={tenants}
@@ -111,29 +113,28 @@ const Header = ({ sidebarCollapsed, toggleSidebar }: IHeaderParams) => {
                 optionValue="key"
                 placeholder="Seleccionar empresa"
                 itemTemplate={tenantOptionTemplate}
-                className="w-64"
+                className="border-none text-sm"
+                style={{ width: '200px' }}
                 loading={loading}
                 disabled={loading || tenants.length === 0}
               />
             </div>
-            )
-          }
+          )}
 
-          <div className="text-sm text-gray-600">
-            <span className="font-medium">{getUserName()}</span>
-            {user?.roles && (
-              <span className="text-gray-400 ml-2">
-                ({user.roles.map((r) => r.name).join(', ')})
-              </span>
-            )}
+          {/* User Info */}
+         <div className="flex items-center gap-5 px-3 rounded-lg">
+            <div className="w-12 h-12 bg-gray-800 rounded-full flex items-center justify-center">
+              <Icon icon="mdi:account" className="text-white text-xl" />
+            </div>
+            <div className="leading-tight">
+              <p className="font-semibold text-gray-900 text-sm">{getUserName()}</p>
+              {user?.roles && (
+                <p className="text-xs text-gray-500">
+                  {user.roles.map((r) => r.name).join(', ')}
+                </p>
+              )}
+            </div>
           </div>
-
-          <Button
-            icon={<Icon icon="mdi:logout" />}
-            label="Salir"
-            className="p-button-outlined p-button-sm"
-            onClick={handleLogout}
-          />
         </div>
       </div>
     </header>
