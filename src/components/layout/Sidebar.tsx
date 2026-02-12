@@ -45,7 +45,7 @@ const Sidebar: React.FC<SidebarProps> = ({ collapsed }) => {
 
   useEffect(() => {
     if (user?.userId) {
-      viewsService.getUserViews(user.userId)
+      viewsService.getRoleViews()
         .then(response => {
           setViews(response.data);
         })

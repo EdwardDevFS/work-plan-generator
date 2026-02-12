@@ -170,7 +170,7 @@ const Users: React.FC = () => {
 
     try {
       const [userViewsResponse, defaultViewsResponse] = await Promise.all([
-        viewsService.getUserViews(user.id, realTenant),
+        viewsService.getRoleViews(),
         viewsService.getDefaultViewsForUser(user.id, realTenant)
       ]);
 
@@ -253,11 +253,11 @@ const Users: React.FC = () => {
     if (!selectedUser) return;
 
     try {
-      if (selectedViews.length > 0) {
-        await viewsService.updateUserViews(selectedUser.id, selectedViews, realTenant);
-      } else {
-        await viewsService.deleteUserViews(selectedUser.id, realTenant);
-      }
+      // if (selectedViews.length > 0) {
+      //   await viewsService.updateUserViews(selectedUser.id, selectedViews, realTenant);
+      // } else {
+      //   await viewsService.deleteUserViews(selectedUser.id, realTenant);
+      // }
       
       toast.current?.show({
         severity: 'success',

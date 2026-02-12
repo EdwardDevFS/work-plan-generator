@@ -34,9 +34,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [userViews, setUserViews] = useState<View[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
-  const loadUserViews = async (userId: string, tenantId: string) => {
+  const loadUserViews = async () => {
     try {
-      const response = await viewsService.getUserViews(userId, tenantId);
+      const response = await viewsService.getRoleViews();
       console.log(response)
       setUserViews(response.data);
     } catch (error) {
@@ -53,7 +53,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         setAccessToken(storedToken);
         setUser(decoded);
         if (decoded.userId && decoded.tenantId) {
-          loadUserViews(decoded.userId, decoded.tenantId);
+          loadUserViews();
         }
       } else {
         localStorage.removeItem('access_token');
@@ -74,7 +74,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       setUser(decoded);
 
       if (decoded?.userId && decoded?.tenantId) {
-        await loadUserViews(decoded.userId, decoded.tenantId);
+        await loadUserViews();
       }
     } catch (error) {
       throw error;
@@ -91,7 +91,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   const refreshUserViews = async () => {
     if (user?.userId && user?.tenantId) {
-      await loadUserViews(user.userId, user.tenantId);
+      await loadUserViews();
     }
   };
 
