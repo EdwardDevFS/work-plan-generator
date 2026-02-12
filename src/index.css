@@ -9,3 +9,21 @@ body{
 .sidebar-toggle-btn .p-button-icon {
   font-size: 1.5rem;
 }
+
+@font-face {
+  font-family: 'Avenir';
+  src: url('/fonts/AvenirLTProMedium.otf') format('opentype');
+  font-weight: 500;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Avenir';
+  src: url('/fonts/AvenirLTProHeavy.otf') format('opentype');
+  font-weight: 800;
+  font-style: normal;
+}
+
+body {
+  font-family: 'Avenir', sans-serif;
+}

@@ -6,10 +6,10 @@ import { Dialog } from 'primereact/dialog';
 import { InputText } from 'primereact/inputtext';
 import { InputTextarea } from 'primereact/inputtextarea';
 import { Toast } from 'primereact/toast';
-import { Toolbar } from 'primereact/toolbar';
 import { Tag } from 'primereact/tag';
 import { Panel } from 'primereact/panel';
 import { Accordion, AccordionTab } from 'primereact/accordion';
+import { Icon } from '@iconify/react';
 import { DepartmentAutocomplete } from '../../components/common/geodata/DepartmentAutocomplete';
 import { ProvinceAutocomplete } from '../../components/common/geodata/ProvinceAutocomplete';
 import { DistrictAutocomplete } from '../../components/common/geodata/DistrictAutocomplete';
@@ -199,83 +199,143 @@ export const ZonalsManagement: React.FC = () => {
     }
   };
 
-  const leftToolbarTemplate = () => (
-    <Button label="Nuevo Zonal" icon="pi pi-plus" className="p-button-success" onClick={openNew} />
-  );
-
   const actionBodyTemplate = (rowData: Zonal) => (
     <div className="flex gap-2">
-      <Button icon="pi pi-trash" className="p-button-rounded p-button-danger p-button-sm" onClick={() => deleteZonal(rowData)} />
+      <Button 
+        icon={<Icon icon="mdi:delete" className="text-base" />}
+        className="!border-none !outline-none p-2 text-red-600 hover:bg-red-50 rounded-lg" 
+        style={{ boxShadow: 'none' }}
+        text
+        onClick={() => deleteZonal(rowData)} 
+      />
     </div>
   );
 
   const statusBodyTemplate = (rowData: Zonal) => (
-    <Tag value={rowData.isActive ? 'Activo' : 'Inactivo'} severity={rowData.isActive ? 'success' : 'danger'} />
+    <Tag 
+      value={rowData.isActive ? 'Activo' : 'Inactivo'} 
+      severity={rowData.isActive ? 'success' : 'danger'}
+      className="text-xs px-3 py-1"
+    />
   );
 
   return (
-    <div className="p-6">
+    <div className="p-4">
       <Toast ref={toast} />
       
-      <div className="mb-6">
-        <h1 className="text-3xl font-bold text-gray-800">Gestión de Zonales</h1>
-        <p className="text-gray-600 mt-2">Administre zonales, sedes y locales de trabajo</p>
+      {/* Header Section */}
+      <div className="mb-10">
+        <h1 className="text-4xl font-bold text-gray-900">Gestión de Zonales</h1>
+        <p className="text-lg text-gray-500 -mt-5">Administre zonales, sedes y locales de trabajo</p>
       </div>
 
-      <div className="bg-white rounded-lg shadow">
-        <Toolbar className="mb-4 border-none" left={leftToolbarTemplate} />
+      {/* Main Card */}
+      <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+        {/* Toolbar */}
+        <div className="pb-5 border-b border-gray-200 bg-gray-50">
+          <Button 
+            label="Nuevo Zonal" 
+            icon={<Icon icon="mdi:plus" className="text-lg" />}
+            className="!border-none !outline-none bg-blue-700 hover:bg-blue-800 text-white rounded-lg text-sm font-medium"
+            style={{ boxShadow: 'none' }}
+            onClick={openNew} 
+          />
+        </div>
         
+        {/* DataTable */}
         <DataTable
           value={zonals}
           loading={loading}
           paginator
           rows={10}
           rowsPerPageOptions={[5, 10, 25]}
-          className="p-datatable-sm"
+          className="text-sm custom-datatable"
           emptyMessage="No hay zonales registrados"
+          stripedRows
         >
-          <Column field="name" header="Nombre" sortable />
-          <Column field="description" header="Descripción" />
-          <Column field="departmentName" header="Ubicación" body={(rowData) => `${rowData.districtName || ''}`} />
-          <Column header="Estado" body={statusBodyTemplate} />
-          <Column header="Acciones" body={actionBodyTemplate} style={{ width: '100px' }} />
+          <Column 
+            field="name" 
+            header="Nombre" 
+            sortable 
+            className="font-medium text-gray-900"
+          />
+          <Column 
+            field="description" 
+            header="Descripción"
+            className="text-gray-700"
+          />
+          <Column 
+            field="departmentName" 
+            header="Ubicación" 
+            body={(rowData) => `${rowData.districtName || ''}`}
+            className="text-gray-600 text-xs"
+          />
+          <Column 
+            header="Estado" 
+            body={statusBodyTemplate}
+            style={{ width: '100px' }}
+          />
+          <Column 
+            header="Acciones" 
+            body={actionBodyTemplate} 
+            style={{ width: '100px' }}
+            className="text-center"
+          />
         </DataTable>
       </div>
 
+      {/* Dialog */}
       <Dialog
         visible={dialogVisible}
         style={{ width: '900px' }}
-        header="Nuevo Zonal"
+        header={
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0">
+              <Icon icon="mdi:map-marker-multiple" className="text-blue-700 text-xl" />
+            </div>
+            <div className="leading-tight">
+              <h2 className="text-lg font-semibold text-gray-900 mb-0">Nuevo Zonal</h2>
+              <p className="text-xs text-gray-500 mt-0.5">Complete la información del zonal, sedes y locales</p>
+            </div>
+          </div>
+        }
         modal
         className="p-fluid"
         onHide={hideDialog}
       >
-        <div className="space-y-6">
+        <div className="space-y-4 mt-4">
           {/* Información del Zonal */}
-          <Panel header="Información del Zonal" className="mb-4">
-            <div className="space-y-4">
+          <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
+            <h3 className="text-sm font-semibold text-gray-700 mb-3 flex items-center gap-2">
+              <Icon icon="mdi:information" className="text-gray-500" />
+              Información del Zonal
+            </h3>
+            
+            <div className="space-y-3">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Nombre del Zonal *</label>
+                <label className="block text-xs font-medium text-gray-700 mb-1.5">Nombre del Zonal *</label>
                 <InputText
                   value={zonalName}
                   onChange={(e) => setZonalName(e.target.value)}
                   placeholder="Ej: PCM Tacna"
+                  className="text-sm"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Descripción</label>
+                <label className="block text-xs font-medium text-gray-700 mb-1.5">Descripción</label>
                 <InputTextarea
                   value={zonalDescription}
                   onChange={(e) => setZonalDescription(e.target.value)}
                   rows={3}
                   placeholder="Descripción del zonal"
+                  className="text-sm"
                 />
               </div>
 
-              <div className="grid grid-cols-3 gap-4">
+              <div className="grid grid-cols-3 gap-3">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Departamento *</label>
+                  <label className="block text-xs font-medium text-gray-700 mb-1.5">Departamento *</label>
                   <DepartmentAutocomplete
                     value={selectedDepartment}
                     onChange={(dept) => {
@@ -288,7 +348,7 @@ export const ZonalsManagement: React.FC = () => {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Provincia *</label>
+                  <label className="block text-xs font-medium text-gray-700 mb-1.5">Provincia *</label>
                   <ProvinceAutocomplete
                     value={selectedProvince}
                     onChange={(prov) => {
@@ -301,7 +361,7 @@ export const ZonalsManagement: React.FC = () => {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Distrito *</label>
+                  <label className="block text-xs font-medium text-gray-700 mb-1.5">Distrito *</label>
                   <DistrictAutocomplete
                     value={selectedDistrict}
                     onChange={setSelectedDistrict}
@@ -311,64 +371,75 @@ export const ZonalsManagement: React.FC = () => {
                 </div>
               </div>
             </div>
-          </Panel>
+          </div>
 
           {/* Sedes */}
-          <Panel header="Sedes y Locales de Trabajo" className="mb-4">
+          <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
+            <h3 className="text-sm font-semibold text-gray-700 mb-3 flex items-center gap-2">
+              <Icon icon="mdi:office-building" className="text-gray-500" />
+              Sedes y Locales de Trabajo
+            </h3>
+            
             <div className="mb-4 p-4 bg-blue-50 rounded-lg border border-blue-200">
-              <h4 className="font-semibold text-blue-900 mb-3">
+              <h4 className="font-semibold text-blue-900 mb-3 text-sm">
                 {editingHqIndex !== null ? 'Editar Sede' : 'Agregar Nueva Sede'}
               </h4>
               
               <div className="space-y-3">
                 <div className="grid grid-cols-2 gap-3">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Nombre *</label>
+                    <label className="block text-xs font-medium text-gray-700 mb-1.5">Nombre *</label>
                     <InputText
                       value={currentHq.name || ''}
                       onChange={(e) => setCurrentHq({ ...currentHq, name: e.target.value })}
                       placeholder="Ej: Sede Ciudad Nueva"
+                      className="text-sm"
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Dirección</label>
+                    <label className="block text-xs font-medium text-gray-700 mb-1.5">Dirección</label>
                     <InputText
                       value={currentHq.address || ''}
                       onChange={(e) => setCurrentHq({ ...currentHq, address: e.target.value })}
                       placeholder="Dirección de la sede"
+                      className="text-sm"
                     />
                   </div>
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Descripción</label>
+                  <label className="block text-xs font-medium text-gray-700 mb-1.5">Descripción</label>
                   <InputTextarea
                     value={currentHq.description || ''}
                     onChange={(e) => setCurrentHq({ ...currentHq, description: e.target.value })}
                     rows={2}
                     placeholder="Descripción de la sede"
+                    className="text-sm"
                   />
                 </div>
 
                 {/* Locales de trabajo */}
-                <div className="border-t pt-3 mt-3">
-                  <h5 className="font-semibold text-gray-700 mb-2">Locales de Trabajo (Mínimo 1) *</h5>
+                <div className="border-t border-blue-200 pt-3 mt-3">
+                  <h5 className="font-semibold text-gray-700 mb-2 text-xs">Locales de Trabajo (Mínimo 1) *</h5>
                   
                   <div className="grid grid-cols-3 gap-2 mb-2">
                     <InputText
                       value={currentWorkplace.name || ''}
                       onChange={(e) => setCurrentWorkplace({ ...currentWorkplace, name: e.target.value })}
                       placeholder="Nombre del local"
+                      className="text-sm"
                     />
                     <InputText
                       value={currentWorkplace.code || ''}
                       onChange={(e) => setCurrentWorkplace({ ...currentWorkplace, code: e.target.value })}
                       placeholder="Código"
+                      className="text-sm"
                     />
                     <Button
                       label="Agregar Local"
-                      icon="pi pi-plus"
-                      className="p-button-sm"
+                      icon={<Icon icon="mdi:plus" className="text-base mr-2" />}
+                      className="!border-none !outline-none bg-blue-700 hover:bg-blue-800 text-white rounded-lg text-sm font-medium"
+                      style={{ boxShadow: 'none' }}
                       onClick={addWorkplace}
                     />
                   </div>
@@ -376,14 +447,16 @@ export const ZonalsManagement: React.FC = () => {
                   {currentHq.workplaces && currentHq.workplaces.length > 0 && (
                     <div className="space-y-2 mt-3">
                       {currentHq.workplaces.map((wp) => (
-                        <div key={wp.tempId} className="flex items-center justify-between p-2 bg-gray-50 rounded">
+                        <div key={wp.tempId} className="flex items-center justify-between p-2 bg-white rounded border border-gray-200">
                           <div>
-                            <span className="font-medium">{wp.name}</span>
-                            {wp.code && <span className="text-sm text-gray-500 ml-2">({wp.code})</span>}
+                            <span className="font-medium text-sm">{wp.name}</span>
+                            {wp.code && <span className="text-xs text-gray-500 ml-2">({wp.code})</span>}
                           </div>
                           <Button
-                            icon="pi pi-trash"
-                            className="p-button-rounded p-button-danger p-button-sm p-button-text"
+                            icon={<Icon icon="mdi:delete" className="text-base" />}
+                            className="!border-none !outline-none p-2 text-red-600 hover:bg-red-50 rounded-lg"
+                            style={{ boxShadow: 'none' }}
+                            text
                             onClick={() => removeWorkplace(wp.tempId)}
                           />
                         </div>
@@ -396,8 +469,10 @@ export const ZonalsManagement: React.FC = () => {
                   {editingHqIndex !== null && (
                     <Button
                       label="Cancelar"
-                      icon="pi pi-times"
-                      className="p-button-text p-button-sm"
+                      icon={<Icon icon="mdi:close" className="text-base mr-2" />}
+                      className="!border-none !outline-none text-gray-700 bg-gray-100 hover:bg-gray-200 px-4 py-2 rounded-lg text-sm"
+                      style={{ boxShadow: 'none' }}
+                      text
                       onClick={() => {
                         setCurrentHq({});
                         setEditingHqIndex(null);
@@ -406,8 +481,9 @@ export const ZonalsManagement: React.FC = () => {
                   )}
                   <Button
                     label={editingHqIndex !== null ? 'Actualizar Sede' : 'Agregar Sede'}
-                    icon="pi pi-check"
-                    className="p-button-sm"
+                    icon={<Icon icon="mdi:check" className="text-base mr-2" />}
+                    className="!border-none !outline-none bg-blue-700 hover:bg-blue-800 text-white px-4 py-2 rounded-lg text-sm font-medium"
+                    style={{ boxShadow: 'none' }}
                     onClick={addHeadquarter}
                   />
                 </div>
@@ -417,23 +493,27 @@ export const ZonalsManagement: React.FC = () => {
             {/* Lista de sedes agregadas */}
             {headquarters.length > 0 && (
               <div className="mt-4">
-                <h4 className="font-semibold text-gray-700 mb-3">Sedes Agregadas ({headquarters.length})</h4>
+                <h4 className="font-semibold text-gray-700 mb-3 text-sm">Sedes Agregadas ({headquarters.length})</h4>
                 <Accordion>
                   {headquarters.map((hq, index) => (
                     <AccordionTab
                       key={hq.tempId}
                       header={
                         <div className="flex items-center justify-between w-full">
-                          <span className="font-medium">{hq.name}</span>
+                          <span className="font-medium text-sm">{hq.name}</span>
                           <div className="flex gap-2" onClick={(e) => e.stopPropagation()}>
                             <Button
-                              icon="pi pi-pencil"
-                              className="p-button-rounded p-button-info p-button-sm p-button-text"
+                              icon={<Icon icon="mdi:pencil" className="text-base" />}
+                              className="!border-none !outline-none p-2 text-blue-600 hover:bg-blue-50 rounded-lg"
+                              style={{ boxShadow: 'none' }}
+                              text
                               onClick={() => editHeadquarter(index)}
                             />
                             <Button
-                              icon="pi pi-trash"
-                              className="p-button-rounded p-button-danger p-button-sm p-button-text"
+                              icon={<Icon icon="mdi:delete" className="text-base" />}
+                              className="!border-none !outline-none p-2 text-red-600 hover:bg-red-50 rounded-lg"
+                              style={{ boxShadow: 'none' }}
+                              text
                               onClick={() => removeHeadquarter(hq.tempId)}
                             />
                           </div>
@@ -463,14 +543,51 @@ export const ZonalsManagement: React.FC = () => {
                 </Accordion>
               </div>
             )}
-          </Panel>
+          </div>
         </div>
 
-        <div className="flex justify-end gap-2 mt-6">
-          <Button label="Cancelar" icon="pi pi-times" className="p-button-text" onClick={hideDialog} />
-          <Button label="Crear Zonal" icon="pi pi-check" onClick={saveZonal} loading={loading} />
+        {/* Footer Buttons */}
+        <div className="flex justify-end gap-3 mt-6 pt-4 border-t border-gray-200">
+          <Button 
+            label="Cancelar" 
+            icon={<Icon icon="mdi:close" className="text-base mr-2" />}
+            className="!border-none !outline-none text-gray-700 bg-gray-100 hover:bg-gray-200 px-4 py-2 rounded-lg text-sm"
+            style={{ boxShadow: 'none' }}
+            text
+            onClick={hideDialog} 
+          />
+          <Button 
+            label="Crear Zonal" 
+            icon={<Icon icon="mdi:check" className="text-base mr-2" />}
+            className="!border-none !outline-none bg-blue-700 hover:bg-blue-800 text-white px-4 py-2 rounded-lg text-sm font-medium"
+            style={{ boxShadow: 'none' }}
+            onClick={saveZonal} 
+            loading={loading} 
+          />
         </div>
       </Dialog>
+
+      {/* Estilos personalizados para el DataTable */}
+      <style>{`
+        .custom-datatable .p-datatable-thead > tr > th.p-highlight {
+          background-color: #1f2937 !important;
+          color: white !important;
+          border-top-left-radius: 0.5rem !important;
+          border-top-right-radius: 0.5rem !important;
+        }
+        
+        .custom-datatable .p-datatable-thead > tr > th.p-highlight .p-column-title {
+          color: white !important;
+        }
+        
+        .custom-datatable .p-datatable-thead > tr > th.p-highlight .p-sortable-column-icon {
+          color: white !important;
+        }
+        
+        .custom-datatable .p-datatable-thead > tr > th.p-highlight .p-column-filter-menu-button {
+          color: white !important;
+        }
+      `}</style>
     </div>
   );
 };

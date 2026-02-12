@@ -6,9 +6,9 @@ import { Dialog } from 'primereact/dialog';
 import { InputText } from 'primereact/inputtext';
 import { MultiSelect } from 'primereact/multiselect';
 import { Toast } from 'primereact/toast';
-import { Toolbar } from 'primereact/toolbar';
 import { Tag } from 'primereact/tag';
 import { Password } from 'primereact/password';
+import { Icon } from '@iconify/react';
 import { DepartmentAutocomplete } from '../../components/common/geodata/DepartmentAutocomplete';
 import { ProvinceAutocomplete } from '../../components/common/geodata/ProvinceAutocomplete';
 import { DistrictAutocomplete } from '../../components/common/geodata/DistrictAutocomplete';
@@ -127,140 +127,250 @@ export const UsersManagement: React.FC = () => {
     }
   };
 
-  const leftToolbarTemplate = () => (
-    <Button label="Nuevo Usuario" icon="pi pi-plus" className="p-button-success" onClick={openNew} />
-  );
-
   const actionBodyTemplate = (rowData: User) => (
     <div className="flex gap-2">
-      <Button icon="pi pi-pencil" className="p-button-rounded p-button-info p-button-sm" onClick={() => openEdit(rowData)} />
-      <Button icon="pi pi-trash" className="p-button-rounded p-button-danger p-button-sm" onClick={() => deleteUser(rowData)} />
+      <Button 
+        icon={<Icon icon="mdi:pencil" className="text-base" />}
+        className="!border-none !outline-none p-2 text-blue-600 hover:bg-blue-50 rounded-lg" 
+        style={{ boxShadow: 'none' }}
+        text
+        onClick={() => openEdit(rowData)} 
+      />
+      <Button 
+        icon={<Icon icon="mdi:delete" className="text-base" />}
+        className="!border-none !outline-none p-2 text-red-600 hover:bg-red-50 rounded-lg" 
+        style={{ boxShadow: 'none' }}
+        text
+        onClick={() => deleteUser(rowData)} 
+      />
     </div>
   );
 
   const statusBodyTemplate = (rowData: User) => (
-    <Tag value={rowData.isActive ? 'Activo' : 'Inactivo'} severity={rowData.isActive ? 'success' : 'danger'} />
+    <Tag 
+      value={rowData.isActive ? 'Activo' : 'Inactivo'} 
+      severity={rowData.isActive ? 'success' : 'danger'}
+      className="text-xs px-3 py-1"
+    />
   );
 
   const rolesBodyTemplate = (rowData: User) => (
     <div className="flex gap-1 flex-wrap">
       {rowData.roles?.map(role => (
-        <Tag key={role.id} value={role.name} className="text-xs" />
+        <Tag key={role.id} value={role.name} className="text-xs px-2 py-1 bg-blue-100 text-blue-700" />
       ))}
     </div>
   );
 
   return (
-    <div className="p-6">
+    <div className="p-4">
       <Toast ref={toast} />
       
-      <div className="mb-6">
-        <h1 className="text-3xl font-bold text-gray-800">Gestión de Usuarios</h1>
-        <p className="text-gray-600 mt-2">Administre los usuarios del sistema</p>
+      {/* Header Section */}
+      <div className="mb-10">
+        <h1 className="text-4xl font-bold text-gray-900">Gestión de Usuarios</h1>
+        <p className="text-lg text-gray-500 -mt-5">Administre los usuarios del sistema</p>
       </div>
 
-      <div className="bg-white rounded-lg shadow">
-        <Toolbar className="mb-4 border-none" left={leftToolbarTemplate} />
+       <div className="pb-5 border-b border-gray-200 bg-gray-50">
+          <Button 
+            label="Nuevo Usuario" 
+            icon={<Icon icon="mdi:plus" className="text-lg" />}
+            className="!border-none !outline-none bg-blue-700 hover:bg-blue-800 text-white rounded-lg text-sm font-medium"
+            style={{ boxShadow: 'none' }}
+            onClick={openNew} 
+          />
+        </div>
+
+      {/* Main Card */}
+      <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+        {/* Toolbar */}
+       
         
+        {/* DataTable */}
         <DataTable
           value={users}
           loading={loading}
           paginator
           rows={10}
           rowsPerPageOptions={[5, 10, 25]}
-          className="p-datatable-sm"
+          className="text-sm custom-datatable"
           emptyMessage="No hay usuarios registrados"
+          stripedRows
         >
-          <Column field="username" header="Usuario" sortable />
-          <Column field="firstName" header="Nombre" sortable body={(rowData) => `${rowData.firstName} ${rowData.lastName}`} />
-          <Column field="email" header="Email" sortable />
-          <Column header="Roles" body={rolesBodyTemplate} />
-          <Column field="departmentName" header="Ubicación" body={(rowData) => `${rowData.departmentName || ''}`} />
-          <Column header="Estado" body={statusBodyTemplate} />
-          <Column header="Acciones" body={actionBodyTemplate} style={{ width: '120px' }} />
+          <Column 
+            field="username" 
+            header="Usuario" 
+            sortable 
+            className="font-medium text-gray-900"
+          />
+          <Column 
+            field="firstName" 
+            header="Nombre" 
+            sortable 
+            body={(rowData) => `${rowData.firstName} ${rowData.lastName}`}
+            className="text-gray-700"
+          />
+          <Column 
+            field="email" 
+            header="Email" 
+            sortable 
+            className="text-gray-600"
+          />
+          <Column 
+            header="Roles" 
+            body={rolesBodyTemplate} 
+          />
+          <Column 
+            field="departmentName" 
+            header="Ubicación" 
+            body={(rowData) => `${rowData.departmentName || ''}`}
+            className="text-gray-600 text-xs"
+          />
+          <Column 
+            header="Estado" 
+            body={statusBodyTemplate} 
+            style={{ width: '100px' }}
+          />
+          <Column 
+            header="Acciones" 
+            body={actionBodyTemplate} 
+            style={{ width: '120px' }}
+            className="text-center"
+          />
         </DataTable>
       </div>
 
-      <Dialog
+      {/* Dialog */}
+     <Dialog
         visible={dialogVisible}
-        style={{ width: '600px' }}
-        header={editingUser ? 'Editar Usuario' : 'Nuevo Usuario'}
+        style={{ width: '650px' }}
+        header={
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0">
+              <Icon icon={editingUser ? "mdi:account-edit" : "mdi:account-plus"} className="text-blue-700 text-xl" />
+            </div>
+            <div className="leading-tight">
+              <h2 className="text-lg font-semibold text-gray-900 mb-0">
+                {editingUser ? 'Editar Usuario' : 'Nuevo Usuario'}
+              </h2>
+              <p className="text-xs text-gray-500 mt-0.5">
+                {editingUser ? 'Modifique la información del usuario' : 'Complete los datos del nuevo usuario'}
+              </p>
+            </div>
+          </div>
+        }
         modal
         className="p-fluid"
         onHide={hideDialog}
       >
-        <div className="space-y-4">
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Nombre</label>
-              <InputText
-                value={formData.firstName}
-                onChange={(e) => setFormData({ ...formData, firstName: e.target.value })}
-                placeholder="Ingrese nombre"
-              />
+        <div className="space-y-4 mt-4">
+          {/* Información Personal */}
+          <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
+            <h3 className="text-sm font-semibold text-gray-700 mb-3 flex items-center gap-2">
+              <Icon icon="mdi:account-circle" className="text-gray-500" />
+              Información Personal
+            </h3>
+            
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <label className="block text-xs font-medium text-gray-700 mb-1.5">Nombre</label>
+                <InputText
+                  value={formData.firstName}
+                  onChange={(e) => setFormData({ ...formData, firstName: e.target.value })}
+                  placeholder="Ingrese nombre"
+                  className="text-sm"
+                />
+              </div>
+              <div>
+                <label className="block text-xs font-medium text-gray-700 mb-1.5">Apellido</label>
+                <InputText
+                  value={formData.lastName}
+                  onChange={(e) => setFormData({ ...formData, lastName: e.target.value })}
+                  placeholder="Ingrese apellido"
+                  className="text-sm"
+                />
+              </div>
             </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Apellido</label>
-              <InputText
-                value={formData.lastName}
-                onChange={(e) => setFormData({ ...formData, lastName: e.target.value })}
-                placeholder="Ingrese apellido"
-              />
-            </div>
           </div>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Usuario</label>
-            <InputText
-              value={formData.username}
-              onChange={(e) => setFormData({ ...formData, username: e.target.value })}
-              placeholder="Ingrese usuario"
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Email</label>
-            <InputText
-              type="email"
-              value={formData.email}
-              onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-              placeholder="Ingrese email"
-            />
-          </div>
-
-          {!editingUser && (
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Contraseña</label>
-              <Password
-                value={formData.password}
-                onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                placeholder="Ingrese contraseña"
-                toggleMask
-                feedback={false}
-              />
-            </div>
-          )}
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Roles</label>
-            <MultiSelect
-              value={formData.roleIds}
-              options={roles}
-              onChange={(e) => setFormData({ ...formData, roleIds: e.value })}
-              optionLabel="name"
-              optionValue="id"
-              placeholder="Seleccione roles"
-              display="chip"
-              className="w-full"
-            />
-          </div>
-
-          <div className="border-t pt-4">
-            <h3 className="text-sm font-semibold text-gray-700 mb-3">Ubicación Geográfica</h3>
+          {/* Credenciales */}
+          <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
+            <h3 className="text-sm font-semibold text-gray-700 mb-3 flex items-center gap-2">
+              <Icon icon="mdi:key" className="text-gray-500" />
+              Credenciales de Acceso
+            </h3>
             
             <div className="space-y-3">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Departamento</label>
+                <label className="block text-xs font-medium text-gray-700 mb-1.5">Usuario</label>
+                <InputText
+                  value={formData.username}
+                  onChange={(e) => setFormData({ ...formData, username: e.target.value })}
+                  placeholder="Ingrese usuario"
+                  className="text-sm"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-medium text-gray-700 mb-1.5">Email</label>
+                <InputText
+                  type="email"
+                  value={formData.email}
+                  onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                  placeholder="Ingrese email"
+                  className="text-sm"
+                />
+              </div>
+
+              {!editingUser && (
+                <div>
+                  <label className="block text-xs font-medium text-gray-700 mb-1.5">Contraseña</label>
+                  <Password
+                    value={formData.password}
+                    onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                    placeholder="Ingrese contraseña"
+                    toggleMask
+                    feedback={false}
+                    className="text-sm"
+                  />
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Roles */}
+          <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
+            <h3 className="text-sm font-semibold text-gray-700 mb-3 flex items-center gap-2">
+              <Icon icon="mdi:shield-account" className="text-gray-500" />
+              Permisos y Roles
+            </h3>
+            
+            <div>
+              <label className="block text-xs font-medium text-gray-700 mb-1.5">Roles</label>
+              <MultiSelect
+                value={formData.roleIds}
+                options={roles}
+                onChange={(e) => setFormData({ ...formData, roleIds: e.value })}
+                optionLabel="name"
+                optionValue="id"
+                placeholder="Seleccione roles"
+                display="chip"
+                className="w-full text-sm"
+              />
+            </div>
+          </div>
+
+          {/* Ubicación Geográfica */}
+          <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
+            <h3 className="text-sm font-semibold text-gray-700 mb-3 flex items-center gap-2">
+              <Icon icon="mdi:map-marker" className="text-gray-500" />
+              Ubicación Geográfica
+            </h3>
+            
+            <div className="space-y-3">
+              <div>
+                <label className="block text-xs font-medium text-gray-700 mb-1.5">Departamento</label>
                 <DepartmentAutocomplete
                   value={selectedDepartment}
                   onChange={(dept) => {
@@ -273,7 +383,7 @@ export const UsersManagement: React.FC = () => {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Provincia</label>
+                <label className="block text-xs font-medium text-gray-700 mb-1.5">Provincia</label>
                 <ProvinceAutocomplete
                   value={selectedProvince}
                   onChange={(prov) => {
@@ -286,7 +396,7 @@ export const UsersManagement: React.FC = () => {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Distrito</label>
+                <label className="block text-xs font-medium text-gray-700 mb-1.5">Distrito</label>
                 <DistrictAutocomplete
                   value={selectedDistrict}
                   onChange={setSelectedDistrict}
@@ -298,11 +408,48 @@ export const UsersManagement: React.FC = () => {
           </div>
         </div>
 
-        <div className="flex justify-end gap-2 mt-6">
-          <Button label="Cancelar" icon="pi pi-times" className="p-button-text" onClick={hideDialog} />
-          <Button label="Guardar" icon="pi pi-check" onClick={saveUser} loading={loading} />
+        {/* Footer Buttons */}
+        <div className="flex justify-end gap-3 mt-6 pt-4 border-t border-gray-200">
+          <Button 
+            label="Cancelar" 
+            icon={<Icon icon="mdi:close" className="text-base mr-2" />}
+            className="!border-none !outline-none text-gray-700 bg-gray-100 hover:bg-gray-200 px-4 py-2 rounded-lg text-sm"
+            style={{ boxShadow: 'none' }}
+            text
+            onClick={hideDialog} 
+          />
+          <Button 
+            label="Guardar" 
+            icon={<Icon icon="mdi:check" className="text-base mr-2" />}
+            className="!border-none !outline-none bg-blue-700 hover:bg-blue-800 text-white px-4 py-2 rounded-lg text-sm font-medium"
+            style={{ boxShadow: 'none' }}
+            onClick={saveUser} 
+            loading={loading} 
+          />
         </div>
       </Dialog>
+
+      {/* Estilos personalizados para el DataTable */}
+      <style>{`
+        .custom-datatable .p-datatable-thead > tr > th.p-highlight {
+          background-color: #1f2937 !important;
+          color: white !important;
+          border-top-left-radius: 0.5rem !important;
+          border-top-right-radius: 0.5rem !important;
+        }
+        
+        .custom-datatable .p-datatable-thead > tr > th.p-highlight .p-column-title {
+          color: white !important;
+        }
+        
+        .custom-datatable .p-datatable-thead > tr > th.p-highlight .p-sortable-column-icon {
+          color: white !important;
+        }
+        
+        .custom-datatable .p-datatable-thead > tr > th.p-highlight .p-column-filter-menu-button {
+          color: white !important;
+        }
+      `}</style>
     </div>
   );
 };

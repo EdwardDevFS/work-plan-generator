@@ -7,8 +7,8 @@ import { InputText } from 'primereact/inputtext';
 import { InputTextarea } from 'primereact/inputtextarea';
 import { Dropdown } from 'primereact/dropdown';
 import { Toast } from 'primereact/toast';
-import { Toolbar } from 'primereact/toolbar';
 import { Tag } from 'primereact/tag';
+import { Icon } from '@iconify/react';
 import { Role, AccessLevel, CreateRoleDto, UpdateRoleDto } from '../../types/rethinking/organization.types';
 import { accessLevelsService } from '../../services/rethinking/access-levels.service';
 import { rolesService } from '../../services/rethinking/roles.service';
@@ -103,19 +103,31 @@ export const RolesManagement: React.FC = () => {
     }
   };
 
-  const leftToolbarTemplate = () => (
-    <Button label="Nuevo Rol" icon="pi pi-plus" className="p-button-success" onClick={openNew} />
-  );
-
   const actionBodyTemplate = (rowData: Role) => (
     <div className="flex gap-2">
-      <Button icon="pi pi-pencil" className="p-button-rounded p-button-info p-button-sm" onClick={() => openEdit(rowData)} />
-      <Button icon="pi pi-trash" className="p-button-rounded p-button-danger p-button-sm" onClick={() => deleteRole(rowData)} />
+      <Button 
+        icon={<Icon icon="mdi:pencil" className="text-base" />}
+        className="!border-none !outline-none p-2 text-blue-600 hover:bg-blue-50 rounded-lg" 
+        style={{ boxShadow: 'none' }}
+        text
+        onClick={() => openEdit(rowData)} 
+      />
+      <Button 
+        icon={<Icon icon="mdi:delete" className="text-base" />}
+        className="!border-none !outline-none p-2 text-red-600 hover:bg-red-50 rounded-lg" 
+        style={{ boxShadow: 'none' }}
+        text
+        onClick={() => deleteRole(rowData)} 
+      />
     </div>
   );
 
   const statusBodyTemplate = (rowData: Role) => (
-    <Tag value={rowData.isActive ? 'Activo' : 'Inactivo'} severity={rowData.isActive ? 'success' : 'danger'} />
+    <Tag 
+      value={rowData.isActive ? 'Activo' : 'Inactivo'} 
+      severity={rowData.isActive ? 'success' : 'danger'}
+      className="text-xs px-3 py-1"
+    />
   );
 
   const accessLevelBodyTemplate = (rowData: Role) => {
@@ -128,94 +140,201 @@ export const RolesManagement: React.FC = () => {
     return (
       <Tag 
         value={rowData.accessLevel?.name || 'N/A'} 
-        severity={severityMap[rowData.accessLevel?.code || 'BASIC']} 
+        severity={severityMap[rowData.accessLevel?.code || 'BASIC']}
+        className="text-xs px-3 py-1"
       />
     );
   };
 
   return (
-    <div className="p-6">
+    <div className="p-4">
       <Toast ref={toast} />
       
-      <div className="mb-6">
-        <h1 className="text-3xl font-bold text-gray-800">Gestión de Roles</h1>
-        <p className="text-gray-600 mt-2">Administre los roles y sus niveles de acceso</p>
+      {/* Header Section */}
+      <div className="mb-10">
+        <h1 className="text-4xl font-bold text-gray-900">Gestión de Roles</h1>
+        <p className="text-lg text-gray-500 -mt-5">Administre los roles y sus niveles de acceso</p>
       </div>
 
-      <div className="bg-white rounded-lg shadow">
-        <Toolbar className="mb-4 border-none" left={leftToolbarTemplate} />
+      {/* Main Card */}
+      <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+        {/* Toolbar */}
+        <div className="pb-5 border-b border-gray-200 bg-gray-50">
+          <Button 
+            label="Nuevo Rol" 
+            icon={<Icon icon="mdi:plus" className="text-lg" />}
+            className="!border-none !outline-none bg-blue-700 hover:bg-blue-800 text-white rounded-lg text-sm font-medium"
+            style={{ boxShadow: 'none' }}
+            onClick={openNew} 
+          />
+        </div>
         
+        {/* DataTable */}
         <DataTable
           value={roles}
           loading={loading}
           paginator
           rows={10}
           rowsPerPageOptions={[5, 10, 25]}
-          className="p-datatable-sm"
+          className="text-sm custom-datatable"
           emptyMessage="No hay roles registrados"
+          stripedRows
         >
-          <Column field="name" header="Nombre" sortable />
-          <Column field="description" header="Descripción" />
-          <Column header="Nivel de Acceso" body={accessLevelBodyTemplate} />
-          <Column header="Estado" body={statusBodyTemplate} />
-          <Column header="Acciones" body={actionBodyTemplate} style={{ width: '120px' }} />
+          <Column 
+            field="name" 
+            header="Nombre" 
+            sortable 
+            className="font-medium text-gray-900"
+          />
+          <Column 
+            field="description" 
+            header="Descripción"
+            className="text-gray-700"
+          />
+          <Column 
+            header="Nivel de Acceso" 
+            body={accessLevelBodyTemplate}
+          />
+          <Column 
+            header="Estado" 
+            body={statusBodyTemplate}
+            style={{ width: '100px' }}
+          />
+          <Column 
+            header="Acciones" 
+            body={actionBodyTemplate} 
+            style={{ width: '120px' }}
+            className="text-center"
+          />
         </DataTable>
       </div>
 
+      {/* Dialog */}
       <Dialog
         visible={dialogVisible}
-        style={{ width: '500px' }}
-        header={editingRole ? 'Editar Rol' : 'Nuevo Rol'}
+        style={{ width: '650px' }}
+        header={
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0">
+              <Icon icon={editingRole ? "mdi:shield-edit" : "mdi:shield-plus"} className="text-blue-700 text-xl" />
+            </div>
+            <div className="leading-tight">
+              <h2 className="text-lg font-semibold text-gray-900 mb-0">
+                {editingRole ? 'Editar Rol' : 'Nuevo Rol'}
+              </h2>
+              <p className="text-xs text-gray-500 mt-0.5">
+                {editingRole ? 'Modifique la información del rol' : 'Complete los datos del nuevo rol'}
+              </p>
+            </div>
+          </div>
+        }
         modal
         className="p-fluid"
         onHide={hideDialog}
       >
-        <div className="space-y-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Nombre *</label>
-            <InputText
-              value={formData.name}
-              onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-              placeholder="Ej: Coordinador Regional"
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Descripción</label>
-            <InputTextarea
-              value={formData.description}
-              onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-              rows={3}
-              placeholder="Descripción del rol"
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Nivel de Acceso *</label>
-            <Dropdown
-              value={formData.accessLevelId}
-              options={accessLevels}
-              onChange={(e) => setFormData({ ...formData, accessLevelId: e.value })}
-              optionLabel="name"
-              optionValue="id"
-              placeholder="Seleccione nivel de acceso"
-              className="w-full"
-            />
-            {formData.accessLevelId && (
-              <div className="mt-2 p-3 bg-blue-50 rounded text-sm">
-                <p className="text-blue-900">
-                  {accessLevels.find(al => al.id === formData.accessLevelId)?.description}
-                </p>
+        <div className="space-y-4 mt-4">
+          {/* Información del Rol */}
+          <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
+            <h3 className="text-sm font-semibold text-gray-700 mb-3 flex items-center gap-2">
+              <Icon icon="mdi:shield-account" className="text-gray-500" />
+              Información del Rol
+            </h3>
+            
+            <div className="space-y-3">
+              <div>
+                <label className="block text-xs font-medium text-gray-700 mb-1.5">Nombre *</label>
+                <InputText
+                  value={formData.name}
+                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                  placeholder="Ej: Coordinador Regional"
+                  className="text-sm"
+                />
               </div>
-            )}
+
+              <div>
+                <label className="block text-xs font-medium text-gray-700 mb-1.5">Descripción</label>
+                <InputTextarea
+                  value={formData.description}
+                  onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                  rows={3}
+                  placeholder="Descripción del rol"
+                  className="text-sm"
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* Nivel de Acceso */}
+          <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
+            <h3 className="text-sm font-semibold text-gray-700 mb-3 flex items-center gap-2">
+              <Icon icon="mdi:key" className="text-gray-500" />
+              Nivel de Acceso
+            </h3>
+            
+            <div>
+              <label className="block text-xs font-medium text-gray-700 mb-1.5">Nivel de Acceso *</label>
+              <Dropdown
+                value={formData.accessLevelId}
+                options={accessLevels}
+                onChange={(e) => setFormData({ ...formData, accessLevelId: e.value })}
+                optionLabel="name"
+                optionValue="id"
+                placeholder="Seleccione nivel de acceso"
+                className="w-full text-sm"
+              />
+              {formData.accessLevelId && (
+                <div className="mt-2 p-3 bg-blue-50 rounded text-sm">
+                  <p className="text-blue-900">
+                    {accessLevels.find(al => al.id === formData.accessLevelId)?.description}
+                  </p>
+                </div>
+              )}
+            </div>
           </div>
         </div>
 
-        <div className="flex justify-end gap-2 mt-6">
-          <Button label="Cancelar" icon="pi pi-times" className="p-button-text" onClick={hideDialog} />
-          <Button label="Guardar" icon="pi pi-check" onClick={saveRole} loading={loading} />
+        {/* Footer Buttons */}
+        <div className="flex justify-end gap-3 mt-6 pt-4 border-t border-gray-200">
+          <Button 
+            label="Cancelar" 
+            icon={<Icon icon="mdi:close" className="text-base mr-2" />}
+            className="!border-none !outline-none text-gray-700 bg-gray-100 hover:bg-gray-200 px-4 py-2 rounded-lg text-sm"
+            style={{ boxShadow: 'none' }}
+            text
+            onClick={hideDialog} 
+          />
+          <Button 
+            label="Guardar" 
+            icon={<Icon icon="mdi:check" className="text-base mr-2" />}
+            className="!border-none !outline-none bg-blue-700 hover:bg-blue-800 text-white px-4 py-2 rounded-lg text-sm font-medium"
+            style={{ boxShadow: 'none' }}
+            onClick={saveRole} 
+            loading={loading} 
+          />
         </div>
       </Dialog>
+
+      {/* Estilos personalizados para el DataTable */}
+      <style>{`
+        .custom-datatable .p-datatable-thead > tr > th.p-highlight {
+          background-color: #1f2937 !important;
+          color: white !important;
+          border-top-left-radius: 0.5rem !important;
+          border-top-right-radius: 0.5rem !important;
+        }
+        
+        .custom-datatable .p-datatable-thead > tr > th.p-highlight .p-column-title {
+          color: white !important;
+        }
+        
+        .custom-datatable .p-datatable-thead > tr > th.p-highlight .p-sortable-column-icon {
+          color: white !important;
+        }
+        
+        .custom-datatable .p-datatable-thead > tr > th.p-highlight .p-column-filter-menu-button {
+          color: white !important;
+        }
+      `}</style>
     </div>
   );
 };

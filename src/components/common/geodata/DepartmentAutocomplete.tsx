@@ -67,6 +67,18 @@ export const DepartmentAutocomplete: React.FC<DepartmentAutocompleteProps> = ({
         dropdown
         forceSelection
       />
+       <style>{`
+        .custom-autocomplete .p-autocomplete-dropdown {
+          background-color: #374151 !important;
+          color: white !important;
+          border-color: #374151 !important;
+        }
+        
+        .custom-autocomplete .p-autocomplete-dropdown:hover {
+          background-color: #1f2937 !important;
+          border-color: #1f2937 !important;
+        }
+      `}</style>
     </div>
   );
 };
