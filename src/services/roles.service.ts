@@ -1,5 +1,13 @@
 import { api } from './api';
-import { Role, PaginatedResponse, PaginationParams, CreateRoleDto, UpdateRoleDto, User, TenantPaginatedRequest } from '../types';
+import { Role, PaginatedResponse, PaginationParams, UpdateRoleDto, User, TenantPaginatedRequest } from '../types';
+
+interface CreateRoleDto {
+
+  name: string;
+  description: string;
+  viewIds: string[];
+
+}
 
 export const rolesService = {
   getAll: (params?: TenantPaginatedRequest) =>

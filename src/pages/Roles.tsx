@@ -278,7 +278,7 @@ const Roles: React.FC = () => {
       <div className="mb-10">
         <h1 className="text-4xl font-bold text-gray-900 flex items-center gap-2">
           <Icon icon="mdi:shield-account" className="text-blue-600" />
-          Gestión de Roles
+          Gestión de Role
         </h1>
         <div className="flex items-center gap-2 -mt-5">
           {selectedTenant && tenantInfo?.name && (

@@ -5,7 +5,7 @@ import { Button } from 'primereact/button';
 import { Dialog } from 'primereact/dialog';
 import { InputText } from 'primereact/inputtext';
 import { InputTextarea } from 'primereact/inputtextarea';
-import { Dropdown } from 'primereact/dropdown';
+import { MultiSelect } from 'primereact/multiselect';
 import { Toast } from 'primereact/toast';
 import { Tag } from 'primereact/tag';
 import { Icon } from '@iconify/react';
@@ -24,8 +24,22 @@ export const RolesManagement: React.FC = () => {
   const [formData, setFormData] = useState({
     name: '',
     description: '',
-    accessLevelId: '',
+    routes: [] as string[],
   });
+
+  // Rutas de la aplicación basadas en tu menú
+  const appRoutes = [
+    { label: 'Clientes', value: '/clientes', icon: 'mdi:table' },
+    { label: 'Usuarios', value: '/usuarios', icon: 'mdi:account-group' },
+    { label: 'Roles', value: '/roles', icon: 'mdi:shield-account' },
+    { label: 'Formularios', value: '/formularios', icon: 'mdi:file-document' },
+    { label: 'Planes de trabajo', value: '/planes-trabajo', icon: 'mdi:strategy' },
+    { label: 'Actividades laborales', value: '/actividades-laborales', icon: 'mdi:calendar-check' },
+    { label: 'Gestión de Usuarios', value: '/gestion-usuarios', icon: 'mdi:account-cog' },
+    { label: 'Gestión de Roles', value: '/gestion-roles', icon: 'mdi:shield-edit' },
+    { label: 'Gestión de Zonales', value: '/gestion-zonales', icon: 'mdi:map-marker-radius' },
+    { label: 'Equipos de trabajo', value: '/equipos-trabajo', icon: 'mdi:account-multiple' },
+  ];
 
   useEffect(() => {
     loadData();
@@ -49,7 +63,7 @@ export const RolesManagement: React.FC = () => {
 
   const openNew = () => {
     setEditingRole(null);
-    setFormData({ name: '', description: '', accessLevelId: '' });
+    setFormData({ name: '', description: '', routes: [] });
     setDialogVisible(true);
   };
 
@@ -58,7 +72,7 @@ export const RolesManagement: React.FC = () => {
     setFormData({
       name: role.name,
       description: role.description || '',
-      accessLevelId: role.accessLevelId,
+      routes: role.routes || [],
     });
     setDialogVisible(true);
   };
@@ -68,7 +82,7 @@ export const RolesManagement: React.FC = () => {
   };
 
   const saveRole = async () => {
-    if (!formData.name || !formData.accessLevelId) {
+    if (!formData.name || formData.routes.length === 0) {
       toast.current?.show({ severity: 'warn', summary: 'Advertencia', detail: 'Complete los campos requeridos' });
       return;
     }
@@ -143,6 +157,16 @@ export const RolesManagement: React.FC = () => {
         severity={severityMap[rowData.accessLevel?.code || 'BASIC']}
         className="text-xs px-3 py-1"
       />
+    );
+  };
+
+  // Template para mostrar las rutas en el MultiSelect
+  const routeOptionTemplate = (option: any) => {
+    return (
+      <div className="flex items-center gap-2">
+        <Icon icon={option.icon} className="text-gray-600" />
+        <span>{option.label}</span>
+      </div>
     );
   };
 
@@ -264,29 +288,44 @@ export const RolesManagement: React.FC = () => {
             </div>
           </div>
 
-          {/* Nivel de Acceso */}
+          {/* Accesos */}
           <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
             <h3 className="text-sm font-semibold text-gray-700 mb-3 flex items-center gap-2">
-              <Icon icon="mdi:key" className="text-gray-500" />
-              Nivel de Acceso
+              <Icon icon="mdi:routes" className="text-gray-500" />
+              Accesos
             </h3>
             
             <div>
-              <label className="block text-xs font-medium text-gray-700 mb-1.5">Nivel de Acceso *</label>
-              <Dropdown
-                value={formData.accessLevelId}
-                options={accessLevels}
-                onChange={(e) => setFormData({ ...formData, accessLevelId: e.value })}
-                optionLabel="name"
-                optionValue="id"
-                placeholder="Seleccione nivel de acceso"
+              <label className="block text-xs font-medium text-gray-700 mb-1.5">Rutas de Acceso *</label>
+              <MultiSelect
+                value={formData.routes}
+                options={appRoutes}
+                onChange={(e) => setFormData({ ...formData, routes: e.value })}
+                optionLabel="label"
+                optionValue="value"
+                placeholder="Seleccione las rutas permitidas"
                 className="w-full text-sm"
+                display="chip"
+                filter
+                maxSelectedLabels={3}
+                itemTemplate={routeOptionTemplate}
               />
-              {formData.accessLevelId && (
-                <div className="mt-2 p-3 bg-blue-50 rounded text-sm">
-                  <p className="text-blue-900">
-                    {accessLevels.find(al => al.id === formData.accessLevelId)?.description}
+              {formData.routes.length > 0 && (
+                <div className="mt-3 p-3 bg-blue-50 rounded-lg border border-blue-100">
+                  <p className="text-blue-900 font-semibold text-xs mb-2">
+                    {formData.routes.length} {formData.routes.length === 1 ? 'ruta seleccionada' : 'rutas seleccionadas'}
                   </p>
+                  <div className="flex flex-wrap gap-2">
+                    {formData.routes.map((route, index) => {
+                      const routeInfo = appRoutes.find(r => r.value === route);
+                      return (
+                        <div key={index} className="flex items-center gap-1.5 text-xs bg-white border border-blue-200 text-blue-800 px-2.5 py-1.5 rounded">
+                          <Icon icon={routeInfo?.icon || 'mdi:link'} className="text-sm" />
+                          <span>{routeInfo?.label}</span>
+                        </div>
+                      );
+                    })}
+                  </div>
                 </div>
               )}
             </div>
