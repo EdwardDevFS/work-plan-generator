@@ -25,6 +25,7 @@ import Tenants from './pages/Tenants';
 import Activities from './pages/Activities';
 import Forms from './pages/Forms';
 import Roles from './pages/Roles';
+import WorkPlans from './pages/WorkPlans';
 
 function App() {
   return (
@@ -137,9 +138,7 @@ function App() {
                     </ProtectedRoute>
                   } 
                 />
-                
-
-                
+              */}
                 <Route 
                   path="work-plans" 
                   element={
@@ -147,9 +146,9 @@ function App() {
                       <WorkPlans />
                     </ProtectedRoute>
                   } 
-                />
-                
- */}
+                />  
+              
+
               <Route 
                   path="forms" 
                   element={

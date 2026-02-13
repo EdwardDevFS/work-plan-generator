@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import { Card } from 'primereact/card';
 import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
 import { Button } from 'primereact/button';
@@ -7,7 +6,7 @@ import { Tag } from 'primereact/tag';
 import { ProgressBar } from 'primereact/progressbar';
 import { Dropdown } from 'primereact/dropdown';
 import { Icon } from '@iconify/react';
-import { Badge } from 'primereact/badge';
+import { Toast } from 'primereact/toast';
 import WorkerScheduleCalendar from './WorkerScheduleCalendar';
 import WorkPlanForm from './WorkPlanform';
 import { UserScheduleListItem, WorkPlanListItem } from '../../types/workplan.types';
@@ -21,6 +20,7 @@ export interface WorkerWithSchedule extends UserScheduleListItem {
 }
 
 const WorkPlansPage: React.FC = () => {
+  const toast = React.useRef<Toast>(null);
   const [workPlans, setWorkPlans] = useState<WorkPlanListItem[]>([]);
   const [selectedPlan, setSelectedPlan] = useState<WorkPlanListItem | null>(null);
   const [workers, setWorkers] = useState<WorkerWithSchedule[]>([]);
@@ -48,6 +48,7 @@ const WorkPlansPage: React.FC = () => {
       }
     } catch (error) {
       console.error('Error loading work plans:', error);
+      toast.current?.show({ severity: 'error', summary: 'Error', detail: 'Error al cargar planes de trabajo' });
     } finally {
       setLoading(false);
     }
@@ -59,10 +60,7 @@ const WorkPlansPage: React.FC = () => {
     try {
       const schedules = await workPlansApi.getUserSchedules(selectedPlan.id);
       
-      // NO CARGAR DETALLES - usar solo el summary que ya viene
       const workersData: WorkerWithSchedule[] = schedules.map((schedule) => {
-        // El progreso real se calculará cuando el usuario haga clic en "Ver Calendario"
-        // Aquí solo mostramos 0% como placeholder
         const progressPercentage = 0;
 
         return {
@@ -77,6 +75,7 @@ const WorkPlansPage: React.FC = () => {
       setWorkers(workersData);
     } catch (error) {
       console.error('Error loading workers:', error);
+      toast.current?.show({ severity: 'error', summary: 'Error', detail: 'Error al cargar trabajadores' });
     } finally {
       setLoading(false);
     }
@@ -93,19 +92,13 @@ const WorkPlansPage: React.FC = () => {
     return configs[status] || configs.DRAFT;
   };
 
-  const formatTime = (minutes: number): string => {
-    const hours = Math.floor(minutes / 60);
-    const mins = minutes % 60;
-    return hours > 0 ? `${hours}h ${mins}m` : `${mins}m`;
-  };
-
   const workerNameTemplate = (worker: WorkerWithSchedule) => (
     <div className="flex items-center gap-3">
-      <div className="w-12 h-12 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white font-bold text-lg shadow-md">
+      <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center text-white font-semibold text-sm shadow-sm">
         {worker.user.firstName[0]}{worker.user.lastName[0]}
       </div>
       <div>
-        <div className="font-semibold text-gray-900">
+        <div className="font-medium text-gray-900">
           {worker.user.firstName} {worker.user.lastName}
         </div>
         <div className="text-xs text-gray-500">{worker.user.email}</div>
@@ -116,36 +109,31 @@ const WorkPlansPage: React.FC = () => {
   const roleTemplate = (worker: WorkerWithSchedule) => (
     <Tag 
       value={worker.role} 
-      severity="info" 
-      icon={<Icon icon="mdi:shield-account" className="mr-1" />}
-      className="text-xs"
+      className="text-xs px-2 py-1 bg-blue-100 text-blue-700"
     />
   );
 
   const statsTemplate = (worker: WorkerWithSchedule) => (
-    <div className="grid grid-cols-3 gap-2">
-      <div className="bg-gradient-to-br from-blue-50 to-blue-100 p-2 rounded-lg border border-blue-200 text-center">
-        <Icon icon="mdi:calendar-today" className="text-blue-600 text-lg mb-1 mx-auto" />
-        <div className="text-xs font-semibold text-blue-900">{worker.summary.totalDays}</div>
-        <div className="text-xs text-blue-700">días</div>
+    <div className="flex gap-3">
+      <div className="flex items-center gap-1.5 text-gray-600">
+        <Icon icon="mdi:calendar-today" className="text-blue-600 text-base" />
+        <span className="text-xs font-medium">{worker.summary.totalDays} días</span>
       </div>
-      <div className="bg-gradient-to-br from-green-50 to-green-100 p-2 rounded-lg border border-green-200 text-center">
-        <Icon icon="mdi:store" className="text-green-600 text-lg mb-1 mx-auto" />
-        <div className="text-xs font-semibold text-green-900">{worker.summary.totalStores}</div>
-        <div className="text-xs text-green-700">locales</div>
+      <div className="flex items-center gap-1.5 text-gray-600">
+        <Icon icon="mdi:store" className="text-green-600 text-base" />
+        <span className="text-xs font-medium">{worker.summary.totalStores} locales</span>
       </div>
-      <div className="bg-gradient-to-br from-purple-50 to-purple-100 p-2 rounded-lg border border-purple-200 text-center">
-        <Icon icon="mdi:clipboard-list" className="text-purple-600 text-lg mb-1 mx-auto" />
-        <div className="text-xs font-semibold text-purple-900">{worker.summary.totalActivities}</div>
-        <div className="text-xs text-purple-700">tareas</div>
+      <div className="flex items-center gap-1.5 text-gray-600">
+        <Icon icon="mdi:clipboard-list" className="text-purple-600 text-base" />
+        <span className="text-xs font-medium">{worker.summary.totalActivities} tareas</span>
       </div>
     </div>
   );
 
   const progressTemplate = (worker: WorkerWithSchedule) => (
-    <div className="space-y-2">
+    <div className="space-y-1.5">
       <div className="flex justify-between items-center">
-        <span className="text-sm font-semibold text-gray-700">
+        <span className="text-xs font-semibold text-gray-700">
           {worker.progressPercentage.toFixed(0)}%
         </span>
         <span className="text-xs text-gray-500">
@@ -164,8 +152,10 @@ const WorkPlansPage: React.FC = () => {
   const actionsTemplate = (worker: WorkerWithSchedule) => (
     <Button
       label="Ver Calendario"
-      icon={<Icon icon="mdi:calendar-month" className="mr-2" />}
-      className="p-button-sm p-button-outlined p-button-primary"
+      icon={<Icon icon="mdi:calendar-month" className="text-base" />}
+      className="!border-none !outline-none text-blue-600 hover:bg-blue-50 rounded-lg text-sm p-2"
+      style={{ boxShadow: 'none' }}
+      text
       onClick={() => setSelectedWorker(worker)}
     />
   );
@@ -184,172 +174,176 @@ const WorkPlansPage: React.FC = () => {
   }
 
   return (
-    <div className="h-full overflow-y-hidden">
-      <div className="p-6 max-w-[1600px] mx-auto">
-        <div className="mb-6">
-          <div className="flex justify-between items-start mb-4">
-            <div>
-              <h1 className="text-3xl font-bold text-gray-800 mb-2 flex items-center gap-3">
-                <Icon icon="mdi:calendar-check" className="text-indigo-600" />
-                Planes de Trabajo
-              </h1>
-              <p className="text-gray-600">
-                Gestiona y visualiza los itinerarios de tu equipo
-              </p>
-            </div>
-            
-            <Button
-              label="Crear Nuevo Plan"
-              icon={<Icon icon="mdi:plus" />}
-              className="p-button-success"
-              onClick={() => setShowCreateForm(true)}
-            />
-          </div>
+    <div className="p-4">
+      <Toast ref={toast} />
+      
+      {/* Header Section */}
+      <div className="mb-10">
+        <h1 className="text-4xl font-bold text-gray-900">Planes de Trabajo</h1>
+        <p className="text-lg text-gray-500 -mt-5">Gestiona y visualiza los itinerarios de tu equipo</p>
+      </div>
 
-          {workPlans.length > 0 && (
-            <Card className="shadow-sm">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-center">
-                <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">
-                    <Icon icon="mdi:file-document" className="mr-1" />
-                    Plan Activo
-                  </label>
-                  <Dropdown
-                    value={selectedPlan}
-                    options={workPlans}
-                    onChange={(e) => setSelectedPlan(e.value)}
-                    optionLabel="planName"
-                    placeholder="Selecciona un plan"
-                    className="w-full"
-                    filter
-                    itemTemplate={(option) => (
-                      <div className="flex items-center justify-between p-2">
-                        <div>
-                          <div className="font-semibold">{option.planName}</div>
-                          <div className="text-xs text-gray-500">{option.description}</div>
-                        </div>
-                        <Tag
-                          value={getPlanStatusConfig(option.status).label}
-                          severity={getPlanStatusConfig(option.status).severity}
-                          className="ml-2"
-                        />
-                      </div>
-                    )}
+      {/* Selector de Plan y Toolbar */}
+      <div className="mb-6 bg-white rounded-xl shadow-sm border border-gray-200 p-4">
+        <div className="flex justify-between items-center mb-4">
+          <div className="flex-1 max-w-md">
+            <label className="block text-xs font-medium text-gray-700 mb-1.5">Plan de Trabajo</label>
+            <Dropdown
+              value={selectedPlan}
+              options={workPlans}
+              onChange={(e) => setSelectedPlan(e.value)}
+              optionLabel="planName"
+              placeholder="Seleccione un plan"
+              className="w-full text-sm"
+              filter
+              itemTemplate={(option) => (
+                <div className="flex items-center justify-between py-2">
+                  <div>
+                    <div className="font-medium text-gray-900">{option.planName}</div>
+                    <div className="text-xs text-gray-500">{option.description}</div>
+                  </div>
+                  <Tag
+                    value={getPlanStatusConfig(option.status).label}
+                    severity={getPlanStatusConfig(option.status).severity}
+                    className="text-xs px-3 py-1 ml-2"
                   />
                 </div>
+              )}
+            />
+          </div>
 
-                {selectedPlan && (
-                  <div className="flex items-center gap-2">
-                    <Tag
-                      value={getPlanStatusConfig(selectedPlan.status).label}
-                      severity={getPlanStatusConfig(selectedPlan.status).severity}
-                      icon={<Icon icon={getPlanStatusConfig(selectedPlan.status).icon} className="mr-1" />}
-                      className="text-sm"
-                    />
-                  </div>
-                )}
-              </div>
-            </Card>
-          )}
+          <Button
+            label="Crear Nuevo Plan"
+            icon={<Icon icon="mdi:plus" className="text-lg" />}
+            className="!border-none !outline-none bg-blue-700 hover:bg-blue-800 text-white rounded-lg text-sm font-medium"
+            style={{ boxShadow: 'none' }}
+            onClick={() => setShowCreateForm(true)}
+          />
         </div>
 
+        {/* Métricas del Plan */}
         {selectedPlan && (
-          <div className="mb-6">
-            <Card className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white shadow-lg border-0">
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                <div className="text-center">
-                  <Icon icon="mdi:account-group" className="text-4xl mb-2 opacity-90 mx-auto" />
-                  <div className="text-sm opacity-90 font-medium uppercase tracking-wide">
-                    Trabajadores
-                  </div>
-                  <div className="text-3xl font-bold mt-1">
-                    {selectedPlan.metrics?.totalUsers || 0}
-                  </div>
-                </div>
-                <div className="text-center">
-                  <Icon icon="mdi:store" className="text-4xl mb-2 opacity-90 mx-auto" />
-                  <div className="text-sm opacity-90 font-medium uppercase tracking-wide">
-                    Locales
-                  </div>
-                  <div className="text-3xl font-bold mt-1">
-                    {selectedPlan.metrics?.totalStores || 0}
-                  </div>
-                </div>
-                <div className="text-center">
-                  <Icon icon="mdi:clipboard-list" className="text-4xl mb-2 opacity-90 mx-auto" />
-                  <div className="text-sm opacity-90 font-medium uppercase tracking-wide">
-                    Actividades
-                  </div>
-                  <div className="text-3xl font-bold mt-1">
-                    {selectedPlan.metrics?.totalActivities || 0}
-                  </div>
-                </div>
-                <div className="text-center">
-                  <Icon icon="mdi:calendar-range" className="text-4xl mb-2 opacity-90 mx-auto" />
-                  <div className="text-sm opacity-90 font-medium uppercase tracking-wide">
-                    Días
-                  </div>
-                  <div className="text-3xl font-bold mt-1">
-                    {selectedPlan.metrics?.estimatedDays || 0}
-                  </div>
-                </div>
+          <div className="grid grid-cols-4 gap-4 mt-4 pt-4 border-t border-gray-200">
+            <div className="bg-gray-50 rounded-lg p-3 border border-gray-200">
+              <div className="flex items-center gap-2 mb-2">
+                <Icon icon="mdi:account-group" className="text-blue-600 text-xl" />
+                <span className="text-xs font-medium text-gray-700">Trabajadores</span>
               </div>
-            </Card>
+              <div className="text-2xl font-bold text-gray-900">{selectedPlan.metrics?.totalUsers || 0}</div>
+            </div>
+            <div className="bg-gray-50 rounded-lg p-3 border border-gray-200">
+              <div className="flex items-center gap-2 mb-2">
+                <Icon icon="mdi:store" className="text-green-600 text-xl" />
+                <span className="text-xs font-medium text-gray-700">Locales</span>
+              </div>
+              <div className="text-2xl font-bold text-gray-900">{selectedPlan.metrics?.totalStores || 0}</div>
+            </div>
+            <div className="bg-gray-50 rounded-lg p-3 border border-gray-200">
+              <div className="flex items-center gap-2 mb-2">
+                <Icon icon="mdi:clipboard-list" className="text-purple-600 text-xl" />
+                <span className="text-xs font-medium text-gray-700">Actividades</span>
+              </div>
+              <div className="text-2xl font-bold text-gray-900">{selectedPlan.metrics?.totalActivities || 0}</div>
+            </div>
+            <div className="bg-gray-50 rounded-lg p-3 border border-gray-200">
+              <div className="flex items-center gap-2 mb-2">
+                <Icon icon="mdi:calendar-range" className="text-indigo-600 text-xl" />
+                <span className="text-xs font-medium text-gray-700">Días Estimados</span>
+              </div>
+              <div className="text-2xl font-bold text-gray-900">{selectedPlan.metrics?.estimatedDays || 0}</div>
+            </div>
           </div>
         )}
+      </div>
 
-        <Card className="max-h-full shadow-sm">
-          <div className="mb-4 flex items-center gap-2">
-            <Icon icon="mdi:account-hard-hat" className="text-2xl text-indigo-600" />
-            <h2 className="text-xl font-bold text-gray-800">Equipo Asignado</h2>
+      {/* Main Card con DataTable */}
+      <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+        {/* Toolbar */}
+        <div className="pb-5 border-b border-gray-200 bg-gray-50 px-6 pt-6">
+          <div className="flex items-center gap-2">
+            <Icon icon="mdi:account-hard-hat" className="text-gray-700 text-xl" />
+            <h2 className="text-lg font-semibold text-gray-900">Equipo Asignado</h2>
             {workers.length > 0 && (
-              <Badge value={workers.length} severity="info" className="ml-2" />
+              <Tag value={workers.length} className="text-xs px-2 py-1 bg-blue-100 text-blue-700 ml-2" />
             )}
           </div>
+        </div>
 
-          <DataTable
-            value={workers}
-            loading={loading}
-            emptyMessage={
-              <div className="text-center py-12">
-                <Icon icon="mdi:account-off" className="text-6xl text-gray-300 mb-4" />
-                <p className="text-gray-500 text-lg">No hay trabajadores asignados a este plan</p>
-              </div>
-            }
-            stripedRows
-            showGridlines
-            paginator
-            rows={10}
-            rowsPerPageOptions={[5, 10, 25, 50]}
-          >
-            <Column
-              header="Trabajador"
-              body={workerNameTemplate}
-              style={{ minWidth: '250px' }}
-            />
-            <Column
-              header="Rol"
-              body={roleTemplate}
-              style={{ minWidth: '120px' }}
-            />
-            <Column
-              header="Estadísticas"
-              body={statsTemplate}
-              style={{ minWidth: '280px' }}
-            />
-            <Column
-              header="Progreso"
-              body={progressTemplate}
-              style={{ minWidth: '180px' }}
-            />
-            <Column
-              header="Acciones"
-              body={actionsTemplate}
-              style={{ minWidth: '150px' }}
-            />
-          </DataTable>
-        </Card>
+        {/* DataTable */}
+        <DataTable
+          value={workers}
+          loading={loading}
+          paginator
+          rows={10}
+          rowsPerPageOptions={[5, 10, 25]}
+          className="text-sm custom-datatable"
+          emptyMessage={
+            <div className="text-center py-12">
+              <Icon icon="mdi:account-off" className="text-6xl text-gray-300 mb-4" />
+              <p className="text-gray-500">No hay trabajadores asignados a este plan</p>
+            </div>
+          }
+          stripedRows
+        >
+          <Column
+            header="Trabajador"
+            body={workerNameTemplate}
+            className="font-medium text-gray-900"
+            style={{ minWidth: '250px' }}
+          />
+          <Column
+            header="Rol"
+            body={roleTemplate}
+            style={{ minWidth: '120px' }}
+          />
+          <Column
+            header="Estadísticas"
+            body={statsTemplate}
+            className="text-gray-700"
+            style={{ minWidth: '280px' }}
+          />
+          <Column
+            header="Progreso"
+            body={progressTemplate}
+            style={{ minWidth: '180px' }}
+          />
+          <Column
+            header="Acciones"
+            body={actionsTemplate}
+            className="text-center"
+            style={{ minWidth: '150px' }}
+          />
+        </DataTable>
       </div>
+     
+       <style>{`
+        .custom-datatable .p-datatable-thead > tr > th {
+          background-color: #1f2937 !important;
+          color: white !important;
+        }
+        
+        .custom-datatable .p-datatable-thead > tr > th .p-column-title {
+          color: white !important;
+        }
+        
+        .custom-datatable .p-datatable-thead > tr > th .p-sortable-column-icon {
+          color: white !important;
+        }
+        
+        .custom-datatable .p-datatable-thead > tr > th .p-column-filter-menu-button {
+          color: white !important;
+        }
+
+        /* Bordes redondeados en las esquinas superiores */
+        .custom-datatable .p-datatable-thead > tr > th:first-child {
+          border-top-left-radius: 0.5rem !important;
+        }
+        
+        .custom-datatable .p-datatable-thead > tr > th:last-child {
+          border-top-right-radius: 0.5rem !important;
+        }
+      `}</style>
+
     </div>
   );
 };

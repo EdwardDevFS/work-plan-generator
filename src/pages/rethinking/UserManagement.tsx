@@ -430,26 +430,24 @@ export const UsersManagement: React.FC = () => {
       </Dialog>
 
       {/* Estilos personalizados para el DataTable */}
-      <style>{`
-        .custom-datatable .p-datatable-thead > tr > th.p-highlight {
-          background-color: #1f2937 !important;
-          color: white !important;
-          border-top-left-radius: 0.5rem !important;
-          border-top-right-radius: 0.5rem !important;
-        }
-        
-        .custom-datatable .p-datatable-thead > tr > th.p-highlight .p-column-title {
-          color: white !important;
-        }
-        
-        .custom-datatable .p-datatable-thead > tr > th.p-highlight .p-sortable-column-icon {
-          color: white !important;
-        }
-        
-        .custom-datatable .p-datatable-thead > tr > th.p-highlight .p-column-filter-menu-button {
-          color: white !important;
-        }
-      `}</style>
+       <style>{`
+          .custom-datatable .p-datatable-thead > tr > th {
+            background-color: #1f2937 !important;
+            color: white !important;
+          }
+          
+          .custom-datatable .p-datatable-thead > tr > th .p-column-title {
+            color: white !important;
+          }
+          
+          .custom-datatable .p-datatable-thead > tr > th .p-sortable-column-icon {
+            color: white !important;
+          }
+          
+          .custom-datatable .p-datatable-thead > tr > th .p-column-filter-menu-button {
+            color: white !important;
+          }
+        `}</style>
     </div>
   );
 };

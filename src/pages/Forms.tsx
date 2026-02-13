@@ -6,7 +6,6 @@ import { Tag } from 'primereact/tag';
 import { Dialog } from 'primereact/dialog';
 import { InputText } from 'primereact/inputtext';
 import { InputTextarea } from 'primereact/inputtextarea';
-import { Dropdown } from 'primereact/dropdown';
 import { InputSwitch } from 'primereact/inputswitch';
 import { Toast } from 'primereact/toast';
 import { confirmDialog } from 'primereact/confirmdialog';
@@ -20,7 +19,6 @@ import { Icon } from '@iconify/react';
 import { useAuth } from '../contexts/AuthContext';
 import { useTenant } from '../contexts/TenantContext';
 
-
 interface FormData {
   name: string;
   description: string;
@@ -31,7 +29,7 @@ interface FormData {
 const INITIAL_FORM_DATA: FormData = {
   name: '',
   description: '',
-  tenantId: '', 
+  tenantId: '',
   isActive: true
 };
 
@@ -62,6 +60,7 @@ const Forms: React.FC = () => {
   const { user } = useAuth();
   const { selectedTenant } = useTenant();
   const realTenant = selectedTenant ?? user?.tenantId;
+
   // ========== LOAD FORMS ==========
   useEffect(() => {
     loadForms();
@@ -87,11 +86,10 @@ const Forms: React.FC = () => {
   // ========== FORM CRUD HANDLERS ==========
   const handleCreateForm = () => {
     setEditingForm(null);
-    if(user?.tenantId){
-
+    if (user?.tenantId) {
       setFormData({
         ...INITIAL_FORM_DATA,
-        tenantId: user?.tenantId // Reemplazar con el valor real
+        tenantId: user?.tenantId
       });
       setShowFormDialog(true);
     }
@@ -109,7 +107,6 @@ const Forms: React.FC = () => {
   };
 
   const handleSaveForm = async () => {
-    // Validación básica
     if (!formData.name.trim()) {
       toast.current?.show({
         severity: 'warn',
@@ -148,7 +145,7 @@ const Forms: React.FC = () => {
           detail: 'Formulario creado correctamente'
         });
       }
-      
+
       setShowFormDialog(false);
       setFormData(INITIAL_FORM_DATA);
       loadForms();
@@ -224,33 +221,38 @@ const Forms: React.FC = () => {
   // ========== COLUMN TEMPLATES ==========
   const statusBodyTemplate = (form: Form) => {
     return form.isActive ? (
-      <Tag value="Activo" severity="success" />
+      <Tag value="Activo" severity="success" className="text-xs px-3 py-1" />
     ) : (
-      <Tag value="Inactivo" severity="danger" />
+      <Tag value="Inactivo" severity="danger" className="text-xs px-3 py-1" />
     );
   };
-
 
   const actionsBodyTemplate = (form: Form) => {
     return (
       <div className="flex gap-2">
         <Button
-          icon={<Icon icon="mdi:form-select" />}
-          className="p-button-rounded p-button-text p-button-sm p-button-info"
+          icon={<Icon icon="mdi:form-select" className="text-base" />}
+          className="!border-none !outline-none p-2 text-indigo-600 hover:bg-indigo-50 rounded-lg"
+          style={{ boxShadow: 'none' }}
+          text
           onClick={() => handleManageFields(form)}
           tooltip="Gestionar campos"
           tooltipOptions={{ position: 'top' }}
         />
         <Button
-          icon={<Icon icon="mdi:pencil" />}
-          className="p-button-rounded p-button-text p-button-sm"
+          icon={<Icon icon="mdi:pencil" className="text-base" />}
+          className="!border-none !outline-none p-2 text-blue-600 hover:bg-blue-50 rounded-lg"
+          style={{ boxShadow: 'none' }}
+          text
           onClick={() => handleEditForm(form)}
           tooltip="Editar"
           tooltipOptions={{ position: 'top' }}
         />
         <Button
-          icon={<Icon icon="mdi:delete" />}
-          className="p-button-rounded p-button-text p-button-sm p-button-danger"
+          icon={<Icon icon="mdi:delete" className="text-base" />}
+          className="!border-none !outline-none p-2 text-red-600 hover:bg-red-50 rounded-lg"
+          style={{ boxShadow: 'none' }}
+          text
           onClick={() => handleDeleteForm(form)}
           tooltip="Eliminar"
           tooltipOptions={{ position: 'top' }}
@@ -259,98 +261,88 @@ const Forms: React.FC = () => {
     );
   };
 
-  // ========== TABLE HEADER ==========
-  const tableHeader = (
-    <div className="flex justify-between items-center">
-      <h2 className="text-xl font-bold">Formularios</h2>
-      <Button
-        label="Nuevo Formulario"
-        icon={<Icon icon="mdi:plus" />}
-        onClick={handleCreateForm}
-        className="p-button-success"
-      />
-    </div>
-  );
-
-  // ========== DIALOG FOOTER ==========
-  const formDialogFooter = (
-    <div className="flex gap-2 justify-end">
-      <Button
-        label="Cancelar"
-        icon={<Icon icon="mdi:close" />}
-        onClick={() => {
-          setShowFormDialog(false);
-          setFormData(INITIAL_FORM_DATA);
-        }}
-        className="p-button-text"
-      />
-      <Button
-        label="Guardar"
-        icon={<Icon icon="mdi:check" />}
-        onClick={handleSaveForm}
-      />
-    </div>
-  );
-
   // ========== MAIN RENDER ==========
   return (
-    <div className="p-6">
+    <div className="p-4">
       <Toast ref={toast} />
       <ConfirmDialog />
 
       {/* VISTA: Lista de formularios */}
       {!showFieldsView && (
         <>
-          <div className="mb-4">
-            <h1 className="text-3xl font-bold text-gray-900 mb-2">
-              Gestión de Formularios
-            </h1>
-            <p className="text-gray-600">
-              Administra los formularios y sus campos personalizados
-            </p>
+          {/* Header Section */}
+          <div className="mb-10">
+            <h1 className="text-4xl font-bold text-gray-900">Gestión de Formularios</h1>
+            <p className="text-lg text-gray-500 -mt-5">Administra los formularios y sus campos personalizados</p>
           </div>
 
-          <DataTable
-            value={forms}
-            header={tableHeader}
-            loading={loading}
-            emptyMessage="No hay formularios creados"
-            className="p-datatable-gridlines"
-            responsiveLayout="scroll"
-            stripedRows
-          >
-            <Column field="name" header="Nombre" sortable />
-            <Column field="description" header="Descripción" />
+          {/* Toolbar */}
+          <div className="pb-5 border-b border-gray-200 bg-gray-50">
+            <Button
+              label="Nuevo Formulario"
+              icon={<Icon icon="mdi:plus" className="text-lg" />}
+              className="!border-none !outline-none bg-blue-700 hover:bg-blue-800 text-white rounded-lg text-sm font-medium"
+              style={{ boxShadow: 'none' }}
+              onClick={handleCreateForm}
+            />
+          </div>
 
-            <Column 
-              field="isActive" 
-              header="Estado" 
-              body={statusBodyTemplate} 
-            />
-            <Column
-              body={actionsBodyTemplate}
-              exportable={false}
-              style={{ minWidth: '180px' }}
-              header="Acciones"
-            />
-          </DataTable>
+          {/* Main Card */}
+          <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+            <DataTable
+              value={forms}
+              loading={loading}
+              paginator
+              rows={10}
+              rowsPerPageOptions={[5, 10, 25]}
+              className="text-sm custom-datatable"
+              emptyMessage="No hay formularios creados"
+              stripedRows
+            >
+              <Column
+                field="name"
+                header="Nombre"
+                sortable
+                className="font-medium text-gray-900"
+              />
+              <Column
+                field="description"
+                header="Descripción"
+                className="text-gray-600"
+              />
+              <Column
+                field="isActive"
+                header="Estado"
+                body={statusBodyTemplate}
+                style={{ width: '100px' }}
+              />
+              <Column
+                body={actionsBodyTemplate}
+                header="Acciones"
+                className="text-center"
+                style={{ width: '180px' }}
+              />
+            </DataTable>
+          </div>
         </>
       )}
 
       {/* VISTA: Gestión de campos del formulario */}
       {showFieldsView && selectedForm && (
         <div>
-          <div className="mb-4 flex items-center gap-4">
+          <div className="mb-6 flex items-center gap-4">
             <Button
-              icon={<Icon icon="mdi:arrow-left" />}
-              className="p-button-text"
+              icon={<Icon icon="mdi:arrow-left" className="text-lg" />}
+              className="!border-none !outline-none text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg p-2"
+              style={{ boxShadow: 'none' }}
+              text
               onClick={handleBackToForms}
               tooltip="Volver a formularios"
               tooltipOptions={{ position: 'right' }}
             />
             <div>
-              <h2 className="text-2xl font-bold">{selectedForm.name}</h2>
-              <p className="text-gray-600">{selectedForm.description}</p>
+              <h2 className="text-2xl font-bold text-gray-900">{selectedForm.name}</h2>
+              <p className="text-sm text-gray-600">{selectedForm.description}</p>
             </div>
           </div>
           <FormFieldList
@@ -366,67 +358,102 @@ const Forms: React.FC = () => {
       {/* DIALOG: Crear/Editar formulario */}
       <Dialog
         visible={showFormDialog}
-        style={{ width: '500px' }}
-        header={editingForm ? 'Editar Formulario' : 'Nuevo Formulario'}
+        style={{ width: '600px' }}
+        header={
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0">
+              <Icon icon={editingForm ? "mdi:pencil" : "mdi:plus-circle"} className="text-blue-700 text-xl" />
+            </div>
+            <div className="leading-tight">
+              <h2 className="text-lg font-semibold text-gray-900 mb-0">
+                {editingForm ? 'Editar Formulario' : 'Nuevo Formulario'}
+              </h2>
+              <p className="text-xs text-gray-500 mt-0.5">
+                {editingForm ? 'Modifique la información del formulario' : 'Complete los datos del nuevo formulario'}
+              </p>
+            </div>
+          </div>
+        }
         modal
-        footer={formDialogFooter}
+        className="p-fluid"
         onHide={() => {
           setShowFormDialog(false);
           setFormData(INITIAL_FORM_DATA);
         }}
       >
-        <div className="space-y-4">
-          <div className="field">
-            <label htmlFor="form-name" className="block text-sm font-medium mb-2">
-              Nombre *
-            </label>
-            <InputText
-              id="form-name"
-              value={formData.name}
-              onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-              className="w-full"
-              placeholder="Ingrese el nombre del formulario"
-            />
-          </div>
+        <div className="space-y-4 mt-4">
+          {/* Información Básica */}
+          <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
+            <h3 className="text-sm font-semibold text-gray-700 mb-3 flex items-center gap-2">
+              <Icon icon="mdi:information-outline" className="text-gray-500" />
+              Información del Formulario
+            </h3>
 
-          <div className="field">
-            <label htmlFor="form-description" className="block text-sm font-medium mb-2">
-              Descripción *
-            </label>
-            <InputTextarea
-              id="form-description"
-              value={formData.description}
-              onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-              className="w-full"
-              rows={3}
-              placeholder="Ingrese una descripción del formulario"
-            />
-          </div>
+            <div className="space-y-3">
+              <div>
+                <label htmlFor="form-name" className="block text-xs font-medium text-gray-700 mb-1.5">
+                  Nombre *
+                </label>
+                <InputText
+                  id="form-name"
+                  value={formData.name}
+                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                  className="text-sm"
+                  placeholder="Ingrese el nombre del formulario"
+                />
+              </div>
 
-          {/* <div className="field">
-            <label htmlFor="form-purpose" className="block text-sm font-medium mb-2">
-              Propósito *
-            </label>
-            <Dropdown
-              id="form-purpose"
-              value={formData.purpose}
-              onChange={(e) => setFormData({ ...formData, purpose: e.value })}
-              options={FORM_PURPOSE_OPTIONS}
-              className="w-full"
-              placeholder="Seleccione el propósito"
-            />
-          </div> */}
+              <div>
+                <label htmlFor="form-description" className="block text-xs font-medium text-gray-700 mb-1.5">
+                  Descripción *
+                </label>
+                <InputTextarea
+                  id="form-description"
+                  value={formData.description}
+                  onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                  className="text-sm"
+                  rows={3}
+                  placeholder="Ingrese una descripción del formulario"
+                />
+              </div>
 
-          <div className="field flex items-center gap-3">
-            <InputSwitch
-              id="form-active"
-              checked={formData.isActive}
-              onChange={(e) => setFormData({ ...formData, isActive: e.value })}
-            />
-            <label htmlFor="form-active" className="text-sm font-medium">
-              Formulario activo
-            </label>
+              <div className="bg-blue-50 rounded-lg p-3 border border-blue-200">
+                <div className="flex items-center gap-3">
+                  <InputSwitch
+                    id="form-active"
+                    checked={formData.isActive}
+                    onChange={(e) => setFormData({ ...formData, isActive: e.value })}
+                  />
+                  <label htmlFor="form-active" className="text-xs font-medium text-blue-900 cursor-pointer">
+                    <Icon icon="mdi:check-circle" className="mr-1" />
+                    Formulario activo
+                  </label>
+                </div>
+              </div>
+            </div>
           </div>
+        </div>
+
+        {/* Footer Buttons */}
+        <div className="flex justify-end gap-3 mt-6 pt-4 border-t border-gray-200">
+          <Button
+            label="Cancelar"
+            icon={<Icon icon="mdi:close" className="text-base mr-2" />}
+            className="!border-none !outline-none text-gray-700 bg-gray-100 hover:bg-gray-200 px-4 py-2 rounded-lg text-sm"
+            style={{ boxShadow: 'none' }}
+            text
+            onClick={() => {
+              setShowFormDialog(false);
+              setFormData(INITIAL_FORM_DATA);
+            }}
+          />
+          <Button
+            label="Guardar"
+            icon={<Icon icon="mdi:check" className="text-base mr-2" />}
+            className="!border-none !outline-none bg-blue-700 hover:bg-blue-800 text-white px-4 py-2 rounded-lg text-sm font-medium"
+            style={{ boxShadow: 'none' }}
+            onClick={handleSaveForm}
+          />
         </div>
       </Dialog>
 
@@ -453,6 +480,26 @@ const Forms: React.FC = () => {
           setPreviewFields([]);
         }}
       />
+
+      {/* Estilos personalizados para el DataTable */}
+      <style>{`
+        .custom-datatable .p-datatable-thead > tr > th {
+          background-color: #1f2937 !important;
+          color: white !important;
+        }
+        
+        .custom-datatable .p-datatable-thead > tr > th .p-column-title {
+          color: white !important;
+        }
+        
+        .custom-datatable .p-datatable-thead > tr > th .p-sortable-column-icon {
+          color: white !important;
+        }
+        
+        .custom-datatable .p-datatable-thead > tr > th .p-column-filter-menu-button {
+          color: white !important;
+        }
+      `}</style>
     </div>
   );
 };
